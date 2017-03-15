@@ -1,0 +1,165 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+   <data>
+  <!-- Vista Formulario Presamo-->
+   <record model="ir.ui.view" id="mapia_management_loan_form_view">
+   <field name="name">mapia.management.loan.form</field>
+   <field name="model">mapia.management.loan</field>
+   <field name="arch" type="xml">
+     <form string="Solicitud de prestamo">
+         <header>
+   <button name="action_borrador" type="object" string="Cotizacion" states="rechazado,progreso"  class="oe_highlight oe_read_only"/>  
+  <button name="action_rechazar" type="object" string="Rechazar prestamo" states="cotizacion" />
+  <button name="action_aprobar" type="object" string="Aprobar prestamo" states="cotizacion" class="oe_highlight oe_read_only"/>
+        <field name="state" widget="statusbar" nolabel="1"/>
+         </header>
+          <sheet>   
+           <h1>
+              <field name="name" placeholder="Numero de prestamo ..." class="oe_inline"/>
+          </h1>
+           <separator string="Información General"/>
+          <group colspan="4">
+               <group cols="2">   
+               	<field name="afiliado_id"/>
+               	<field name="fecha_solicitud" />
+                <field name="fecha_aprobacion" /> 
+               	<field name="tipo_prestamo_id"/>
+          </group>
+          <group cols="2"> 
+               	<field name="tasa_interes"/>
+                <field name="plazo_pago"/>
+                <field name="periodo_plazo_pago" readonly="1"/>
+                <field name="monto_solicitado"/>
+				<field name="prima"/>
+                <field name="currency_id" invisible="1"/>
+         </group>
+        </group>
+        <notebook>
+        <page string="Plan de pago">
+          <group colspan="4">
+            <group cols="2"> 
+				<field name="total_monto"/>
+                <field name="total_interes"/>
+                <field name="cuato_prestamo"/>
+            </group> 
+            <group cols="2"> 
+            <button name="get_generar_cuotas" class="oe_highlight" attrs="{'invisible': [('state','!=','cotizacion')]}"
+                            string="Calcular plan de pago" type="object" colspan="4"/>
+                </group>   
+               </group>       
+                <field name="cuota_ids">
+                    <tree string="Plan de pago" editable="bottom" readonly="1">
+                         <field name="fecha_pago"/>
+                         <field name="capital" sum="Total"/>
+                         <field name="interes" sum="Total"/>
+                          <field name="monto_cuota" sum="Total"/>
+                          <field name="saldo_prestamo"/>
+                          <field name="state"/>
+                    </tree>
+                </field>
+          </page>
+        <page string="Validacion de documentos">
+        <field name="doc_ids"  context="{'prestamo_id' : id }">
+        <tree string="Documentos">
+                 	 <field name="name"/>
+                 	  <field name="documento"/>
+                 	  <field name="nota"/>
+                 	  <field name="estado"/>
+                 	</tree>
+        </field>
+          </page> 
+           <page string="Detalles de gastos">
+              <group colspan="4">
+                 <group cols="2"> 
+                    <field name="gastos_papeleria"/>
+                    <field name="gasto_timbre"/>
+                 </group>   
+              </group>  
+	      </page> 
+	</notebook>
+    </sheet>
+    <div class="oe_chatter">
+            <field name="message_ids" widget="mail_thread"/>
+    </div>
+     </form>
+   </field> 
+   </record> 
+   <!-- Fin de Vista form  -->
+   <!--  Vista Tree Tipo de Prestamo-->
+   <record model="ir.ui.view" id="mapia_management_loan_tree_view">
+   <field name="name">mapia.management.loan.tree</field>
+   <field name="model">mapia.management.loan</field>
+   <field name="arch" type="xml">
+       <tree string="Solicitud de Prestamos" colors="blue:state == 'cotizacion';red:state == 'progress'; gray:state == 'rechazado'; green:state == 'aprobado'">
+                <field name="name"/>
+                <field name="afiliado_id"/>
+                <field name="fecha_solicitud" />
+                <field name="fecha_aprobacion" /> 
+                <field name="monto_solicitado"/>
+                <field name="tasa_interes" />
+                <field name="saldo_pendiente" attrs="{'invisible': [('state','=','cotizacion')]}"/>
+                <field name="plazo_pago" />
+                <field name="state"/>
+       </tree>
+   </field> 
+   </record>
+   <!--  Accion para solicitud de Prestamos -->
+   <record model="ir.actions.act_window" id="mapia_management_loan_action">
+   <field name="name">Solicitud de prestamo</field>
+   <field name="res_model">mapia.management.loan</field>
+   <field name="view_type">form</field>
+   <field name="view_model">form</field>
+   <field name="help" type="html">
+   <p class="oe_view_nocontent_create">Crear primera solicitud de prestamo</p>
+   </field>
+   </record>
+   
+     <!--  Accion para solicitud de Prestamos -->
+   <record model="ir.actions.act_window" id="mapia_prestamo_esperando_aprobacion_action">
+   <field name="name">Esperando aprobacion</field>
+   <field name="res_model">mapia.management.loan</field>
+   <field name="view_type">form</field>
+   <field name="view_model">form</field>
+     <field name="domain">[('state','=','progress')]</field>
+   <field name="help" type="html">
+   <p class="oe_view_nocontent_create">Crear primera solicitud de prestamo</p>
+   </field>
+   </record>
+      <!--  Accion para solicitud de Prestamos -->
+    <record model="ir.actions.act_window" id="mapia_prestamo_rechazado_action">
+   <field name="name">Prestamos rechazados</field>
+   <field name="res_model">mapia.management.loan</field>
+   <field name="view_type">form</field>
+   <field name="view_model">form</field>
+     <field name="domain">[('state','=','rechazado')]</field>
+   <field name="help" type="html">
+   <p class="oe_view_nocontent_create">Crear primera solicitud de prestamo</p>
+   </field>
+   </record>
+     <!--  Menu Principal de Prestamos-->
+      <menuitem id="mapia_management_general" name="Gestion de Prestamos" string="Gestion de Prestamos" parent="mapia_management_main" sequence="1"/>
+
+   <menuitem string="Solicitud de Prestamo"  id="mapia_solicitud_prestamo" parent="mapia_management_general" action="mapia_management_loan_action" sequence="1"/>
+
+     <menuitem string="Prestamos vigentes"  id="mapia_prestamo_aprobados" parent="mapia_management_general" action="mapia_prestamo_esperando_aprobacion_action" sequence="20"/>
+
+                  <menuitem string="Prestamos rechazado"  id="mapia_prestamo_rechazado" parent="mapia_management_general" action="mapia_prestamo_rechazado_action" sequence="40"/>
+   </data>
+</odoo>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

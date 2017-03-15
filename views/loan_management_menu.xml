@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+    <data>
+ <menuitem id="mapia_management_main" name="Mapia" string="Gestion de Prestamos" web_icon="mapia,static/description/icon.png"/>
+    </data>
+</odoo>

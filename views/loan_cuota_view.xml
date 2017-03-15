@@ -1,0 +1,112 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+   <data>
+  <!-- Vista Formulario Presamo-->
+   <record model="ir.ui.view" id="mapia_management_loan_cuota_form_view">
+   <field name="name">mapia.management.loan.cuota.form</field>
+   <field name="model">mapia.management.loan.cuota</field>
+   <field name="arch" type="xml">
+     <form string="Cuotas de Prestamo">
+		 <header>
+			 <field name="state" widget="statusbar" nolabel="1"/>
+         </header>		
+          <sheet> 
+          <separator string="Información de Cuota"/> 
+          <group colspan="4">
+               <group cols="2">   
+               	<field name="prestamo_id"/>
+               <field name="afiliado_id"/>
+	      </group>
+	      <group cols="2">
+                 <field name="fecha_pago" />
+	            <field name="monto_cuota" />
+	            <field name="capital"/>
+	              <field name="interes"/>	
+	      </group>
+	   </group>		
+	      <notebook>
+	      <page string="Notas">
+		<field name="description" />
+	      </page> 
+	</notebook>
+	</sheet>     
+     </form>
+   </field> 
+   </record> 
+   <!-- Fin de Vista form  -->
+   <!--  Vista Tree Tipo de Prestamo-->
+   <record model="ir.ui.view" id="mapia_management_loan_cuota_view">
+   <field name="name">mapia.management.loan.cuota.tree</field>
+   <field name="model">mapia.management.loan.cuota</field>
+   <field name="arch" type="xml">
+       <tree string="Tipo de Prestamos">
+            <field name="fecha_pago" />
+            	<field name="prestamo_id"/>         
+               <field name="afiliado_id"/>
+	            <field name="monto_cuota" />
+	            <field name="capital"/>
+	              <field name="interes"/>
+       </tree>
+   </field> 
+   </record>
+   <!--  Accion para Prestamos -->
+   <record model="ir.actions.act_window" id="mapia_management_loan_cuota_vigente_action">
+   <field name="name">Cuotas vigentes</field>
+   <field name="res_model">mapia.management.loan.cuota</field>
+   <field name="view_type">form</field>
+   <field name="view_model">form</field>
+    <field name="domain">[('state','=','vigente')]</field>
+   <field name="help" type="html">
+   <p class="oe_view_nocontent_create">Crear cuotas de prestamo</p>
+   </field>
+   </record>
+   
+   <record model="ir.actions.act_window" id="mapia_management_loan_cuota_novigenete_action">
+   <field name="name">Cuotas no vigentes</field>
+   <field name="res_model">mapia.management.loan.cuota</field>
+   <field name="view_type">form</field>
+   <field name="view_model">form</field>
+   <field name="domain">[('state','=','novigente')]</field>
+   <field name="help" type="html">
+   <p class="oe_view_nocontent_create">Crear cuotas de prestamo</p>
+   </field>
+   </record>
+   
+    <record model="ir.actions.act_window" id="mapia_management_loan_cuota_mora_action">
+   <field name="name">Cuotas en mora</field>
+   <field name="res_model">mapia.management.loan.cuota</field>
+   <field name="view_type">form</field>
+   <field name="view_model">form</field>
+   <field name="domain">[('state','=','mora')]</field>
+   <field name="help" type="html">
+   <p class="oe_view_nocontent_create">Crear cuotas de prestamo</p>
+   </field>
+   </record>
+   <!-- Fin de Action de Contratos -->
+     <!--  Menu Principal de Prestamos-->
+      <menuitem id="mapia_cuota_management" name="Cuota de Prestamos" string="Cuota de Prestamos" parent="mapia_management_main" sequence="10"/>
+   <menuitem string="Cuotas viegentes"  id="mapia_menu_cuota_prestamo" parent="mapia_cuota_management" action="mapia_management_loan_cuota_vigente_action" sequence="1"/>
+
+    <menuitem string="Cuotas no vigentes"  id="mapia_cuota_prestamo_no_vigente" parent="mapia_cuota_management" action="mapia_management_loan_cuota_novigenete_action"  sequence="10"/>
+    
+     <menuitem string="Cuotas en mora"  id="mapia_cuota_prestamo_mora" parent="mapia_cuota_management" action="mapia_management_loan_cuota_mora_action"  sequence="20"/>
+    
+   </data>
+</odoo>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

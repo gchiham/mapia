@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+    <data>
+	<record model="ir.ui.view" id="mapia_management_cliente_form">
+        <field name="name">res.partner.form.view.inh</field>
+        <field name="model">res.partner</field>
+        <field name="inherit_id" ref="base.view_partner_form" />
+   	 	<field name="arch" type="xml">
+			<field name="phone" position="before">
+    	 		<field name="x_iden" attrs="{'invisible': [('supplier', '=', True)]}"/>
+				<field name="rtn"/>
+			</field>
+			<notebook position="inside">
+				<page string="Contratos de terrenos" sequence="1" attrs="{'invisible': [('supplier', '=', True)]}">
+        			<field name="contrato_ids" domain="[('state','=','progreso')]"/>
+				</page>
+			</notebook>
+   		</field> 
+   	</record>  
+    </data>
+</odoo>
+
