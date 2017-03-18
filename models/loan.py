@@ -15,6 +15,7 @@ class Loanmapia(models.Model):
     cuato_prestamo = fields.Float("Cuota de prestamo", readonly=True, states={'cotizacion': [('readonly', False)]})
     monto_solicitado = fields.Float("Valor del Terreno", required=True, readonly=True, states={'cotizacion': [('readonly', False)]})
     saldo_pendiente = fields.Float("Saldo pendiente", readonly=True, states={'cotizacion': [('readonly', False)]})
+    product_id = fields.Many2one("product.product", "Tipo de Terrenos", required=True, domain=[('sale_ok', '=', True)])
     # Gastos de prestamo
     gastos_papeleria = fields.Monetary("Gasto de Papeleria", readonly=True, states={'cotizacion': [('readonly', False)]})
     gasto_timbre = fields.Monetary("Gasto de Timbre", readonly=True, states={'cotizacion': [('readonly', False)]})
@@ -23,7 +24,7 @@ class Loanmapia(models.Model):
     notas_desembolso = fields.Text("Notas de desombolso", readonly=True, states={'cotizacion': [('readonly', False)]})
     # Campos generales
     name = fields.Char("Numero de prestamo", required=True, default=lambda self: self.env['ir.sequence'].get('contrato'))
-    afiliado_id = fields.Many2one("res.partner", "Cliente", required=True)
+    afiliado_id = fields.Many2one("res.partner", "Cliente", required=True, domain=[('customer', '=', True)])
     fecha_solicitud = fields.Date("Fecha de solicitud", required=True)
     fecha_aprobacion = fields.Date("Fecha de pago", required=True)
     currency_id = fields.Many2one("res.currency", "Moneda", default=lambda self: self.env.user.company_id.currency_id)
@@ -85,6 +86,7 @@ class Loanmapia(models.Model):
         annuity_factor = 0.0
         saldo_acumulado = 0.0
         capital = 0.0
+        numero_cuotas = 0
         if self.tipo_prestamo_id.tasa_interes_id.capitalizable == 'anual':
             if self.tasa_interes > 0:
                 rate_monthly = (self.tasa_interes / 12.0) / 100.0
@@ -119,13 +121,14 @@ class Loanmapia(models.Model):
         }
         cuota_fecha = (datetime.strptime(self.fecha_aprobacion, '%Y-%m-%d'))
         while plazo <= self.plazo_pago:
-            if plazo == 1:
-                values["fecha_pago"] = cuota_fecha
-            else:
-                cuota_fecha = cuota_fecha + relativedelta(day=cuota_fecha.day, months=1)
-                values["fecha_pago"] = cuota_fecha
+            #if plazo == 1:
+             #   values["fecha_pago"] = cuota_fecha
+            #else:
+            #    cuota_fecha = cuota_fecha + relativedelta(day=cuota_fecha.day, months=1)
+            #    values["fecha_pago"] = cuota_fecha
 
             if plazo == 1:
+                values["fecha_pago"] = cuota_fecha
                 interest = valor_financiar * rate_monthly
                 capital = self.cuato_prestamo - interest
                 values["interes"] = interest
@@ -139,7 +142,9 @@ class Loanmapia(models.Model):
                 values["capital"] = capital
                 saldo_acumulado = saldo_acumulado - capital
                 values["saldo_prestamo"] = saldo_acumulado
-
+                cuota_fecha = cuota_fecha + relativedelta(day=cuota_fecha.day, months=1)
+                values["fecha_pago"] = cuota_fecha
+            values["numero_cuota"] = plazo
             id_cuota = obj_loan_cuota.create(values)
             plazo +=  1
         self.get_calculadora_emi()
@@ -165,6 +170,7 @@ class MapiaLoanline(models.Model):
 
     prestamo_id = fields.Many2one("mapia.management.loan", "Numero de prestamo")
     afiliado_id = fields.Many2one("res.partner", "Cliente", required=True)
+    numero_cuota = fields.Integer("# de cuota", readonly=True)
     fecha_pago = fields.Date("Fecha de Pago")
     monto_cuota = fields.Float("Monto de Cuota")
     capital = fields.Float("Capital")

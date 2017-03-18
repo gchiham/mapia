@@ -24,6 +24,7 @@
                	<field name="fecha_solicitud" />
                 <field name="fecha_aprobacion" /> 
                	<field name="tipo_prestamo_id"/>
+				<field name="product_id"/>
           </group>
           <group cols="2"> 
                	<field name="tasa_interes"/>
@@ -49,9 +50,10 @@
                </group>       
                 <field name="cuota_ids">
                     <tree string="Plan de pago" editable="bottom" readonly="1">
-                         <field name="fecha_pago"/>
-                         <field name="capital" sum="Total"/>
-                         <field name="interes" sum="Total"/>
+						  <field name="numero_cuota"/>
+                          <field name="fecha_pago"/>
+                          <field name="capital" sum="Total"/>
+                          <field name="interes" sum="Total"/>
                           <field name="monto_cuota" sum="Total"/>
                           <field name="saldo_prestamo"/>
                           <field name="state"/>

@@ -13,7 +13,8 @@
           <sheet> 
           <separator string="Información de Cuota"/> 
           <group colspan="4">
-               <group cols="2">   
+               <group cols="2"> 
+				<field name="numero_cuota"/>
                	<field name="prestamo_id"/>
                <field name="afiliado_id"/>
 	      </group>
