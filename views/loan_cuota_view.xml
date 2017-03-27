@@ -8,6 +8,9 @@
    <field name="arch" type="xml">
      <form string="Cuotas de Prestamo">
 		 <header>
+			<button name="validarcuota" type="object" string="Validar cuotas" states="novigente,vigente" class="oe_highlight oe_read_only"/>
+			<button name="cuotaborrador" type="object" string="Cuotas Borrador"  class="oe_highlight oe_read_only"/>
+			<button name="getvigente" type="object" string="Vigente" states="novigente,cotizacion" class="oe_highlight oe_read_only"/>
 			 <field name="state" widget="statusbar" nolabel="1"/>
          </header>		
           <sheet> 
@@ -22,7 +25,8 @@
                  <field name="fecha_pago" />
 	            <field name="monto_cuota" />
 	            <field name="capital"/>
-	              <field name="interes"/>	
+	              <field name="interes"/>
+				<!--<field name="cuota_vigente" invisible="1"/>	-->
 	      </group>
 	   </group>		
 	      <notebook>
@@ -43,10 +47,11 @@
        <tree string="Tipo de Prestamos">
             <field name="fecha_pago" />
             	<field name="prestamo_id"/>         
-               <field name="afiliado_id"/>
+                <field name="afiliado_id"/>
 	            <field name="monto_cuota" />
 	            <field name="capital"/>
-	              <field name="interes"/>
+	            <field name="interes"/>
+				<!--<field name="cuota_vigente" invisible="1"/>-->
        </tree>
    </field> 
    </record>

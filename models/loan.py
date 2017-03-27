@@ -12,14 +12,18 @@ class Loanmapia(models.Model):
     # Valores numericos
     total_interes = fields.Float("Total de interes", readonly=True, states={'cotizacion': [('readonly', False)]})
     total_monto = fields.Float("Monto Financiado", readonly=True, states={'cotizacion': [('readonly', False)]})
+    cuota_seguro = fields.Float("Cuota de seguro", default=0.00)
     cuato_prestamo = fields.Float("Cuota de prestamo", readonly=True, states={'cotizacion': [('readonly', False)]})
+    cuota_prestamo_seguro = fields.Float("Cuota con Seguro")
     monto_solicitado = fields.Float("Valor del Terreno", required=True, readonly=True, states={'cotizacion': [('readonly', False)]})
     saldo_pendiente = fields.Float("Saldo pendiente", readonly=True, states={'cotizacion': [('readonly', False)]})
-    product_id = fields.Many2one("product.product", "Tipo de Terrenos", required=True, domain=[('sale_ok', '=', True)])
+    product_id = fields.Many2many("product.product", string="Terrenos", domain=[('sale_ok', '=', True)])
+    proyecto_id = fields.Many2one("product.category", "Proyecto")
     # Gastos de prestamo
     gastos_papeleria = fields.Monetary("Gasto de Papeleria", readonly=True, states={'cotizacion': [('readonly', False)]})
     gasto_timbre = fields.Monetary("Gasto de Timbre", readonly=True, states={'cotizacion': [('readonly', False)]})
-    prima = fields.Monetary("Prima", readonly=True, states={'cotizacion': [('readonly', False)]})
+    prima = fields.Float("Prima", readonly=True, states={'cotizacion': [('readonly', False)]})
+    prestamo_con_seguro = fields.Boolean("Prestamo con seguro")
 
     notas_desembolso = fields.Text("Notas de desombolso", readonly=True, states={'cotizacion': [('readonly', False)]})
     # Campos generales
@@ -66,6 +70,9 @@ class Loanmapia(models.Model):
         for fee in self.cuota_ids:
             self.total_interes += fee.interes
         self.total_monto = (self.monto_solicitado - self.prima) + self.total_interes
+
+        if self.prestamo_con_seguro:
+            self.cuota_prestamo_seguro = self.cuato_prestamo + self.cuota_seguro
         # self.cuato_prestamo = self._calcular_cuota(self.monto_solicitado, self.tasa_interes, self.plazo_pago)
         # self.total_interes = self.monto_solicitado * (self.tasa_interes / 100.0)
         # self.total_monto = self.monto_solicitado + self.total_interes
@@ -95,20 +102,20 @@ class Loanmapia(models.Model):
 
                 if self.prima > 0:
                     valor_financiar = self.monto_solicitado - self.prima
-                    self.cuato_prestamo = valor_financiar * annuity_factor
+                    self.cuato_prestamo = (valor_financiar * annuity_factor)
 
                 if self.prima == 0:
                     valor_financiar = self.monto_solicitado
-                    self.cuato_prestamo = valor_financiar * annuity_factor
+                    self.cuato_prestamo = (valor_financiar * annuity_factor)
 
             else:
                 if self.prima > 0:
                     valor_financiar = self.monto_solicitado - self.prima
-                    self.cuato_prestamo = (self.monto_solicitado - self.prima) / self.plazo_pago
+                    self.cuato_prestamo = ((self.monto_solicitado - self.prima) / self.plazo_pago)
 
                 if self.prima == 0:
                     valor_financiar = self.monto_solicitado
-                    self.cuato_prestamo = self.monto_solicitado / self.plazo_pago
+                    self.cuato_prestamo = (self.monto_solicitado / self.plazo_pago)
 
         else:
             raise Warning(_('No se han definido tasas capitalizables mensuales y quincenales'))
@@ -180,3 +187,16 @@ class MapiaLoanline(models.Model):
     state = fields.Selection(
         [('cotizacion', 'Cotizacion'), ('cancelada', 'Cancelada'), ('novigente', 'No vigente'), ('vigente', 'Vigente'),('morosa', 'Morosa'),('pagada', 'Pagada')], string='Estado de cuota',readonly=True, default='cotizacion')
     description = fields.Text("Notas Generales")
+    #cuota_vigente = fields.Boolean("Cuota vigenete", compute=getstatuscuota)
+
+    @api.multi
+    def validarcuota(self):
+        self.write({'state': 'pagada'})
+
+    @api.multi
+    def cuotaborrador(self):
+        self.write({'state': 'cotizacion'})
+
+    @api.multi
+    def getvigente(self):
+        self.write({'state': 'vigente'})

@@ -24,14 +24,17 @@
                	<field name="fecha_solicitud" />
                 <field name="fecha_aprobacion" /> 
                	<field name="tipo_prestamo_id"/>
-				<field name="product_id"/>
+				<field name="product_id" widget="many2many_tags"/>
+				<field name="proyecto_id"/>
           </group>
           <group cols="2"> 
                	<field name="tasa_interes"/>
                 <field name="plazo_pago"/>
-                <field name="periodo_plazo_pago" readonly="1"/>
+                <field name="periodo_plazo_pago" invisible="1"/>
                 <field name="monto_solicitado"/>
 				<field name="prima"/>
+				<field name="prestamo_con_seguro"/>
+				<field name="cuota_seguro" attrs="{'invisible': [('prestamo_con_seguro','=', False)]}"/>
                 <field name="currency_id" invisible="1"/>
          </group>
         </group>
@@ -42,6 +45,7 @@
 				<field name="total_monto"/>
                 <field name="total_interes"/>
                 <field name="cuato_prestamo"/>
+				<field name="cuota_prestamo_seguro" attrs="{'invisible': [('prestamo_con_seguro','=', False)]}"/>
             </group> 
             <group cols="2"> 
             <button name="get_generar_cuotas" class="oe_highlight" attrs="{'invisible': [('state','!=','cotizacion')]}"
@@ -57,6 +61,7 @@
                           <field name="monto_cuota" sum="Total"/>
                           <field name="saldo_prestamo"/>
                           <field name="state"/>
+					      	<!--<field name="cuota_vigente" invisible="1"/>-->
                     </tree>
                 </field>
           </page>
@@ -96,7 +101,7 @@
                 <field name="name"/>
                 <field name="afiliado_id"/>
                 <field name="fecha_solicitud" />
-                <field name="fecha_aprobacion" /> 
+                <!--<field name="fecha_aprobacion" /> -->
                 <field name="monto_solicitado"/>
                 <field name="tasa_interes" />
                 <field name="saldo_pendiente" attrs="{'invisible': [('state','=','cotizacion')]}"/>
